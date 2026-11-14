@@ -1,0 +1,49 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap');
+:root{--bg:#f0eaff;--bg2:#dcd2ff;--accent:#6e52b6;--card:#fff;--ink:#242135;--muted:#77738a}*{box-sizing:border-box}body{margin:0;font-family:'DM Sans',system-ui,sans-serif;color:var(--ink);background:linear-gradient(145deg,var(--bg),var(--bg2));min-height:100vh}body[data-background=solid]{background:var(--bg)}body.midnight{--ink:#f5f5ff;--muted:#aeb7ce}a{color:inherit}.profile-shell{min-height:100vh;display:flex;justify-content:center;padding:70px 20px 38px}.profile{width:100%;max-width:510px;text-align:center}.avatar{height:110px;width:110px;border-radius:50%;margin:0 auto 19px;display:grid;place-items:center;font-size:32px;font-weight:800;color:#fff;background:var(--accent);border:5px solid rgba(255,255,255,.65);box-shadow:0 10px 32px #30215b20;overflow:hidden}.avatar img{width:100%;height:100%;object-fit:cover}h1{font-size:29px;letter-spacing:-1.2px;margin:0 0 3px}.handle{font-size:14px;color:var(--accent);font-weight:700}.bio{font-size:15px;line-height:1.65;max-width:390px;margin:17px auto 32px;color:var(--muted)}.links{display:grid;gap:14px}.link-card{display:flex;align-items:center;gap:15px;min-height:80px;text-decoration:none;background:var(--card);padding:14px 19px;border:1px solid #ffffff80;border-radius:20px;box-shadow:0 7px 23px #2d245213;transition:transform .2s,box-shadow .2s;text-align:left}.link-card:hover{transform:translateY(-3px);box-shadow:0 12px 30px #2d245225}.link-icon{display:grid;place-items:center;width:48px;height:48px;flex-shrink:0;border-radius:15px;background:var(--bg);color:var(--accent);font-size:25px}.link-copy{display:grid;gap:4px;flex:1;min-width:0}.link-copy strong{font-size:15px}.link-copy small{font-size:12px;color:var(--muted)}.arrow{color:var(--accent);font-size:19px}.socials{display:flex;gap:13px;justify-content:center;margin:34px auto 25px}.socials a{width:43px;height:43px;display:grid;place-items:center;text-decoration:none;border-radius:50%;background:#ffffff65;color:var(--accent);font-size:23px;transition:transform .2s}.socials a:hover{transform:translateY(-3px)}footer{font-size:12px;color:var(--muted)}footer span{color:#ee7198}footer a{text-decoration:none;color:var(--accent);font-weight:700}body[data-shape=square] .link-card{border-radius:6px}body[data-shape=pill] .link-card{border-radius:100px}body[data-shape=square] .link-icon{border-radius:4px}body[data-shape=pill] .link-icon{border-radius:50%}@media(max-width:550px){.profile-shell{padding:46px 18px 25px}.avatar{width:95px;height:95px}h1{font-size:26px}.link-card{min-height:75px}}
+
+.status{background:var(--card);border-radius:12px;padding:14px 18px;margin:15px auto 24px;font-size:14px;color:var(--accent);line-height:1.5}.status.error{color:#a42f41} .status[hidden]{display:none}
+
+/* Extended design tokens */
+:root{--profile-width:510px;--name-size:29px;--bio-size:15px;--card-title-size:15px;--card-subtitle-size:12px;--profile-font:'DM Sans',system-ui,sans-serif;--background-image:none}
+body{font-family:var(--profile-font)}body[data-background=image]{background-image:linear-gradient(#00000018,#00000018),var(--background-image);background-position:var(--background-position);background-size:var(--background-size);background-attachment:fixed}
+.profile{max-width:var(--profile-width)}h1{font-size:var(--name-size)}.bio{font-size:var(--bio-size)}.link-copy strong{font-size:var(--card-title-size)}.link-copy small{font-size:var(--card-subtitle-size)}
+body[data-layout=wide] .profile-shell{padding-top:38px}
+body[data-card-style=solid] .link-card{box-shadow:none;border:1px solid var(--accent)}
+body[data-card-style=outline] .link-card{background:transparent;border:2px solid var(--accent);box-shadow:none}
+body[data-card-style=minimal] .link-card{border:0;border-bottom:1px solid var(--accent);border-radius:0;box-shadow:none;background:transparent}
+body[data-card-style=neon] .link-card{border:1px solid var(--accent);box-shadow:0 0 12px color-mix(in srgb,var(--accent),transparent 65%)}
+.link-icon img,.socials a img{width:70%;height:70%;object-fit:contain}.avatar img{width:100%;height:100%;object-fit:cover}
+.card-image{height:56px;width:56px;object-fit:cover;flex-shrink:0;border-radius:12px}.music-player{display:flex;align-items:center;flex-direction:column;gap:8px;margin:20px auto;color:var(--muted);font-size:13px}.music-player audio{width:min(100%,350px)}.music-player[hidden]{display:none}
+
+/* Image icons: fill their icon tile without additional CSS padding.
+   Emoji icons continue using the original tile design. */
+.link-icon.has-image{padding:0;background:transparent;overflow:hidden;border-radius:12px}
+.link-icon.has-image img{display:block;width:100%;height:100%;object-fit:cover;border-radius:inherit}
+.socials a.has-image{overflow:hidden;background:transparent}
+.socials a.has-image img{display:block;width:100%;height:100%;object-fit:contain}
+
+/* Social icon backgrounds (07 · Social icons).
+   Class-level overrides apply to image icons as well as emoji/symbol icons. */
+:root{--social-bg-color:#ffffff}
+.socials a,.socials a.has-image{border-radius:50%;transition:transform .2s,background-color .2s,border-radius .2s}
+body[data-social-shape="square"] .socials a{border-radius:0}
+body[data-social-shape="rounded"] .socials a{border-radius:12px}
+body[data-social-shape="circle"] .socials a{border-radius:50%}
+body[data-social-background="on"] .socials a,
+body[data-social-background="on"] .socials a.has-image{background:var(--social-bg-color)}
+body[data-social-background="off"] .socials a,
+body[data-social-background="off"] .socials a.has-image{background:transparent}
+/* Keep all icons inside their background tiles when switched on. */
+body[data-social-background="on"] .socials a.has-image img{width:75%;height:75%;object-fit:contain}
+body[data-social-background="off"] .socials a.has-image img{width:100%;height:100%;object-fit:contain}
+
+/* Responsive embedded YouTube / YouTube Music player */
+.music-player{width:100%;max-width:100%;box-sizing:border-box}
+.music-player .music-youtube{display:block;width:min(100%,510px);aspect-ratio:16/9;height:auto;border:0;border-radius:14px;background:#111827}
+.music-player small{max-width:510px;text-align:center;line-height:1.5}
+
+/* Optional compact music button (05 · Background music). */
+.music-player .music-play-button{cursor:pointer;border:1px solid var(--accent);border-radius:999px;background:var(--card);color:var(--ink);font:inherit;font-weight:600;padding:12px 22px;min-height:44px;max-width:100%;transition:transform .15s,background .15s}
+.music-player .music-play-button:hover{transform:translateY(-1px)}
+.music-player .music-play-button:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
+.music-player:has(.music-play-button) audio:not([controls]){display:none}

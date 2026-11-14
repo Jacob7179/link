@@ -1,0 +1,131 @@
+const preference = {
+  "name": "Jacob",
+  "handle": "@jacob7179",
+  "bio": "Hi, I’m Jacob 👋 IT student exploring programming, web development and technology.",
+  "avatar": "https://avatars.githubusercontent.com/u/70430960?v=4",
+  "theme": "midnight",
+  "shape": "rounded",
+  "background": "solid",
+  "links": [
+    {
+      "title": "Check out my GitHub repositories",
+      "subtitle": "Projects, code & open source",
+      "url": "https://github.com/Jacob7179",
+      "icon": "assets/icons/GitHub.webp",
+      "enabled": true
+    },
+    {
+      "title": "Watch videos on JacobJacob7179 channel",
+      "subtitle": "YouTube videos",
+      "url": "https://www.youtube.com/@JacobJacob7179",
+      "icon": "assets/icons/YouTube.webp",
+      "enabled": true
+    },
+    {
+      "title": "Watch Jacob7179’s Bilibili videos",
+      "subtitle": "Bilibili channel",
+      "url": "https://space.bilibili.com/587848840",
+      "icon": "assets/icons/BiliBili.webp",
+      "enabled": true
+    },
+    {
+      "title": "Jacob on Apple Music",
+      "subtitle": "Apple Music profile",
+      "url": "https://music.apple.com/profile/jacob7179",
+      "icon": "assets/icons/Apple Music.webp",
+      "enabled": true
+    },
+    {
+      "title": "Official髭男Dism by Jacob on Apple Music",
+      "subtitle": "Apple Music playlist",
+      "url": "https://music.apple.com/my/playlist/official%E9%AB%AD%E7%94%B7dism/pl.u-b3b8RMgHKm1paRb",
+      "icon": "",
+      "enabled": true,
+      "iconPath": "assets/icons/OFFICIAL HIGE DANDISM - Album.jpg"
+    },
+    {
+      "title": "Jacob on YouTube Music",
+      "subtitle": "Music profile",
+      "url": "https://music.youtube.com/@JacobJacob7179",
+      "icon": "",
+      "enabled": true,
+      "iconPath": "assets/icons/YouTube Music.webp"
+    },
+    {
+      "title": "Jacob on Spotify",
+      "subtitle": "Spotify profile",
+      "url": "https://open.spotify.com/user/j0e1irlruzvv9ecc25byhoizb",
+      "icon": "assets/icons/Spotify.webp",
+      "enabled": true
+    }
+  ],
+  "socials": [
+    {
+      "label": "GitHub",
+      "url": "https://github.com/Jacob7179",
+      "icon": "assets/icons/github.svg"
+    },
+    {
+      "label": "YouTube",
+      "url": "https://www.youtube.com/@JacobJacob7179",
+      "icon": "assets/icons/youtube.svg"
+    },
+    {
+      "label": "Apple Music",
+      "url": "https://music.apple.com/profile/jacob7179",
+      "icon": "assets/icons/applemusic.svg"
+    },
+    {
+      "label": "Spotify",
+      "url": "https://open.spotify.com/user/j0e1irlruzvv9ecc25byhoizb",
+      "icon": "assets/icons/spotify.svg"
+    }
+  ],
+  "design": {
+    "layout": "centered",
+    "maxWidth": 510,
+    "cardStyle": "neon",
+    "cardStylePath": "",
+    "customCSS": "",
+    "backgroundImage": "",
+    "backgroundImagePosition": "center",
+    "backgroundImageSize": "cover"
+  },
+  "colors": {
+    "background": "",
+    "background2": "",
+    "accent": "",
+    "card": "",
+    "text": "",
+    "muted": ""
+  },
+  "typography": {
+    "fontFamily": "DM Sans",
+    "customFontName": "",
+    "customFontPath": "",
+    "nameSize": 29,
+    "bioSize": 15,
+    "cardTitleSize": 15,
+    "cardSubtitleSize": 12
+  },
+  "assets": {
+    "avatarPath": "https://avatars.githubusercontent.com/u/70430960?v=4",
+    "faviconPath": "https://avatars.githubusercontent.com/u/70430960?v=4",
+    "backgroundPath": "",
+    "defaultCardIconPath": ""
+  },
+  "music": {
+    "path": "https://music.youtube.com/watch?v=Lpk3m6wLyrE",
+    "title": "Shower (Instrumental)",
+    "autoplay": true,
+    "loop": true,
+    "volume": 0.35,
+    "showPlayer": true,
+    "buttonOnly": true
+  },
+  "socialStyle": {
+    "backgroundEnabled": true,
+    "shape": "rounded",
+    "backgroundColor": "#ffffff"
+  }
+};

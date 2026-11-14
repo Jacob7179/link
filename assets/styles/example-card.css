@@ -1,0 +1,3 @@
+/* Optional custom card stylesheet (set design.cardStylePath to assets/styles/example-card.css) */
+.link-card { border: 2px solid var(--accent); }
+.link-card:hover { transform: translateY(-4px) scale(1.01); }
