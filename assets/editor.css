@@ -3,3 +3,17 @@
 .field-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 15px}.field-grid input[type=color]{height:40px;padding:3px}.editor-help{font-size:12px;color:#77738a;line-height:1.5}.panel label.check{display:flex;gap:8px;align-items:center}.panel label.check input{width:auto}
 
 .social-design-controls{background:#faf9fd;border:1px solid #eeeaf5;padding:15px;border-radius:13px;margin:6px 0 18px}.social-design-controls h3{font-size:14px;margin:0 0 9px;color:#41394f}.social-design-controls .field-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.social-design-controls input[type=color]{height:45px;padding:4px;cursor:pointer}.social-design-controls select{cursor:pointer}.social-design-controls .check{margin-bottom:8px}@media(max-width:500px){.social-design-controls .field-grid{grid-template-columns:1fr}}
+
+/* Keep the editor navigation visible while scrolling (desktop and mobile). */
+.editor-body .topbar {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  width: 100%;
+  box-sizing: border-box;
+}
+/* Avoid clipping sticky elements inside the editor. */
+.editor-body { overflow-x: clip; }
+@media (min-width: 901px) {
+  .editor-body .preview-panel { top: 100px; }
+}
