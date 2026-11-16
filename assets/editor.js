@@ -25,3 +25,33 @@ function bindExtras(){if(extrasBound)return;extrasBound=true;
  }for(const [section,keys] of Object.entries(extraFields)){for(const k of keys){const el=$(extraId(section,k));if(!el)continue;el.addEventListener(el.type==='checkbox'?'change':'input',()=>{config[section]||={};config[section][k]=el.type==='checkbox'?el.checked:el.type==='number'?Number(el.value):el.value;store()})}}
  for(const k of ['background','background2','accent','card','text','muted']){$('edit-color-'+k)?.addEventListener('input',e=>{config.colors||={};config.colors[k]=e.target.value;store()})}
  $('reset-colors')?.addEventListener('click',()=>{config.colors={};syncExtras();store()})}
+
+
+// Compact editor actions on mobile; preserve the desktop navbar.
+(() => {
+  const toggle = document.getElementById('mobile-nav-toggle');
+  const nav = document.querySelector('.editor-body .topbar');
+  const actions = document.getElementById('editor-actions');
+  if (!toggle || !nav || !actions) return;
+  const setOpen = open => {
+    nav.classList.toggle('nav-open', open);
+    toggle.setAttribute('aria-expanded', String(open));
+    toggle.setAttribute('aria-label', open ? 'Close editor actions' : 'Open editor actions');
+    const icon = toggle.querySelector('.nav-toggle-icon');
+    if (icon) icon.textContent = open ? '✕' : '☰';
+    const label = toggle.querySelector('.nav-toggle-label');
+    if (label) label.textContent = open ? 'Close' : 'Menu';
+  };
+  toggle.addEventListener('click', () => setOpen(!nav.classList.contains('nav-open')));
+  actions.addEventListener('click', event => {
+    if (event.target.closest('a, button')) setOpen(false);
+  });
+  document.addEventListener('keydown', event => {
+    if (event.key === 'Escape' && nav.classList.contains('nav-open')) {
+      setOpen(false);
+      toggle.focus();
+    }
+  });
+  const desktop = window.matchMedia('(min-width: 701px)');
+  desktop.addEventListener('change', event => { if (event.matches) setOpen(false); });
+})();
