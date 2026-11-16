@@ -11,6 +11,7 @@ function parseImportedPreference(source){const match=source.trim().match(/^(?:co
 const extraFields={design:['cardStyle','layout','maxWidth','cardStylePath','customCSS','backgroundImage','backgroundImagePosition','backgroundImageSize'],typography:['fontFamily','customFontPath','nameSize','bioSize','cardTitleSize','cardSubtitleSize'],assets:['avatarPath','faviconPath','defaultCardIconPath'],music:['path','title','volume','loop','showPlayer','buttonOnly','autoplay']};
 const extraId=(section,k)=>section==='music'?'edit-music'+k[0].toUpperCase()+k.slice(1):section==='assets'?'edit-'+k:'edit-'+k;
 function syncExtras(){if(!config)return;
+ const footerToggle=$('edit-showFooter');if(footerToggle)footerToggle.checked=config.showFooter!==false;
  config.socialStyle||={};
  $('edit-socialBackgroundEnabled').checked=config.socialStyle.backgroundEnabled===true;
  $('edit-socialShape').value=['circle','square','rounded'].includes(config.socialStyle.shape)?config.socialStyle.shape:'circle';
@@ -18,6 +19,7 @@ function syncExtras(){if(!config)return;
  const color=config.colors||{};for(const k of ['background','background2','accent','card','text','muted']){const el=$('edit-color-'+k);if(!el)continue;const themeColor=({lavender:['#f0eaff','#dcd2ff','#6e52b6','#ffffff','#242135','#77738a'],peach:['#fff1e8','#ffd9c6','#ae5e42','#ffffff','#242135','#77738a'],mint:['#e5f8f0','#bdebd9','#26745c','#ffffff','#242135','#77738a'],sky:['#e7f3ff','#c4dfff','#3568a4','#ffffff','#242135','#77738a'],midnight:['#141827','#242d48','#b4c8ff','#222b43','#f5f5ff','#aeb7ce']})[config.theme]||[];const i=['background','background2','accent','card','text','muted'].indexOf(k);el.value=/^#[0-9a-f]{6}$/i.test(color[k]||'')?color[k]:themeColor[i]||'#ffffff'} }
 let extrasBound=false;
 function bindExtras(){if(extrasBound)return;extrasBound=true;
+ $('edit-showFooter')?.addEventListener('change',e=>{config.showFooter=e.target.checked;store()});
  for(const [id,key,event] of [['edit-socialBackgroundEnabled','backgroundEnabled','change'],['edit-socialShape','shape','change'],['edit-socialBackgroundColor','backgroundColor','input']]){
    $(id).addEventListener(event,e=>{config.socialStyle||={};config.socialStyle[key]=key==='backgroundEnabled'?e.target.checked:e.target.value;store()});
  }for(const [section,keys] of Object.entries(extraFields)){for(const k of keys){const el=$(extraId(section,k));if(!el)continue;el.addEventListener(el.type==='checkbox'?'change':'input',()=>{config[section]||={};config[section][k]=el.type==='checkbox'?el.checked:el.type==='number'?Number(el.value):el.value;store()})}}

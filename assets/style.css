@@ -47,3 +47,18 @@ body[data-social-background="off"] .socials a.has-image img{width:100%;height:10
 .music-player .music-play-button:hover{transform:translateY(-1px)}
 .music-player .music-play-button:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
 .music-player:has(.music-play-button) audio:not([controls]){display:none}
+
+/* Blank initial screen followed by a smooth, finished-profile entrance. */
+.page-curtain{position:fixed;inset:0;background:#fff;z-index:9999;pointer-events:none;opacity:0;visibility:hidden}
+html.page-loading .page-curtain{opacity:1;visibility:visible}
+html.page-loading .profile{opacity:0;transform:translateY(18px)}
+html.page-ready .page-curtain{opacity:0;visibility:hidden;transition:opacity .55s ease,visibility 0s linear .55s}
+html.page-ready .profile{animation:profile-appear .7s cubic-bezier(.2,.7,.2,1) both}
+@keyframes profile-appear{from{opacity:0;transform:translateY(18px);filter:blur(4px)}to{opacity:1;transform:translateY(0);filter:blur(0)}}
+@media(prefers-reduced-motion:reduce){html.page-ready .profile{animation:none}html.page-ready .page-curtain{transition:none}}
+
+/* Respect the optional profile footer visibility setting. */
+#page-footer[hidden] { display: none !important; }
+
+/* Keep the footer hidden until the profile explicitly enables it. */
+#page-footer[hidden] { display: none !important; }

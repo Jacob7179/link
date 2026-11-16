@@ -274,3 +274,7 @@ HTML, CSS, and vanilla JavaScript; hosted on GitHub Pages using the included Git
 ## License
 
 See [`LICENSE`](LICENSE) for the project's license terms.
+
+## Hide or show the footer
+
+In `editor.html`, open **08 · Footer** and toggle **Show footer**. This is reflected in the live preview and in exported `config.json` and `preference.js`. Alternatively, set `"showFooter": false` at the top level of your profile preferences to hide the “Made with ♥ · GitHub · Customize · Default page” footer. The default is visible when the option is missing.

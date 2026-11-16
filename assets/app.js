@@ -147,15 +147,22 @@ function render(c,base=''){
   $('links').append(a)
  });
  $('socials').replaceChildren();(Array.isArray(c.socials)?c.socials:[]).filter(Boolean).forEach(s=>{const a=document.createElement('a');a.href=safeUrl(s.url||'');a.title=s.label||'Social link';a.setAttribute('aria-label',s.label||'Social link');icon(a,s.icon||'↗',s.iconPath,base);if(a.href.startsWith('http')){a.target='_blank';a.rel='noopener noreferrer'}$('socials').append(a)});
+ const footer = document.getElementById('page-footer');
+  if (footer) {
+    // Explicitly show only when this profile allows the footer.
+    const visible = c.showFooter !== false;
+    footer.hidden = !visible;
+    footer.style.setProperty('display', visible ? 'block' : 'none', 'important');
+  }
  setupMusic(c,base)
 }
 const validGitHubUser=name=>/^[a-z\d](?:[a-z\d-]{0,37}[a-z\d])?$/i.test(name)&&!name.includes('--');
-async function getJson(url){const response=await fetch(url,{headers:{Accept:'application/vnd.github+json'}});if(!response.ok){if([403,429].includes(response.status))throw Error('GitHub API limit reached. Try again later.');if(response.status===404)throw Error('GitHub user or blog repository not found.');throw Error('GitHub API request failed ('+response.status+').')}return response.json()}
+async function getJson(url){const response=await fetch(url,{headers:{Accept:'application/vnd.github+json'}});if(!response.ok){if([403,429].includes(response.status))throw Error('GitHub API limit reached. Try again later.');if(response.status===404)throw Error('GitHub user or page repository not found.');throw Error('GitHub API request failed ('+response.status+').')}return response.json()}
 async function getDefault(){const r=await fetch('config.json',{cache:'no-store'});if(!r.ok)throw Error('Could not load config.json');return r.json()}
 function parsePreference(source){const m=source.trim().match(/^(?:const|let|var)\s+preference\s*=\s*([\s\S]*?)\s*;?\s*$/);if(!m)throw Error('Invalid preference.js format.');let json=m[1].trim();if(json.endsWith(';'))json=json.slice(0,-1).trim();let c;try{c=JSON.parse(json)}catch{throw Error('preference.js must contain strict JSON.')}if(!c||typeof c!=='object'||!Array.isArray(c.links)||!Array.isArray(c.socials))throw Error('Missing links or socials.');return c}
 async function getGitHubProfile(username){
  if(!validGitHubUser(username))throw Error('Invalid GitHub username.');
- const settings=await fetch('site.json',{cache:'no-store'}).then(r=>{if(!r.ok)throw Error('Could not load site.json');return r.json()});const repository=settings.profileRepository||'blog';if(!/^[\w.-]{1,100}$/.test(repository))throw Error('Invalid repository name.');
+ const settings=await fetch('site.json',{cache:'no-store'}).then(r=>{if(!r.ok)throw Error('Could not load site.json');return r.json()});const repository=settings.profileRepository||'page';if(!/^[\w.-]{1,100}$/.test(repository))throw Error('Invalid repository name.');
  const api='https://api.github.com';const account=await getJson(`${api}/users/${encodeURIComponent(username)}`);if(account.type!=='User')throw Error('GitHub account must belong to a user.');
  const repo=await getJson(`${api}/repos/${encodeURIComponent(username)}/${encodeURIComponent(repository)}`);if(repo.private||repo.owner?.login?.toLowerCase()!==username.toLowerCase())throw Error('Profile repository must be public.');
  const filename=settings.preferenceFile||'preference.js';if(!/^[\w./-]+$/.test(filename)||filename.split('/').includes('..'))throw Error('Invalid preference file path.');
@@ -165,28 +172,86 @@ async function getGitHubProfile(username){
 }
 function showStatus(msg,error=false){const e=$('status');if(e){e.textContent=msg;e.hidden=false;e.classList.toggle('error',error)}}
 function clearStatus(){const e=$('status');if(e)e.hidden=true}
+// Show the profile only when configuration and its visible images are prepared.
+// A bounded wait prevents a broken remote image from leaving a blank page forever.
+async function waitForVisibleImages(maxWaitMs = 2800) {
+ const imgs = [...document.querySelectorAll('#profile img')];
+ if (!imgs.length) return;
+ for (const img of imgs) img.loading = 'eager';
+ const ready = Promise.all(imgs.map(img => {
+   if (img.complete) return Promise.resolve();
+   return new Promise(resolve => {
+     img.addEventListener('load', resolve, {once:true});
+     img.addEventListener('error', resolve, {once:true});
+   });
+ }));
+ await Promise.race([ready, new Promise(resolve => setTimeout(resolve, maxWaitMs))]);
+}
+async function revealPage() {
+ await waitForVisibleImages();
+ // Let the browser lay out the final profile before starting the entrance effect.
+ await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+ document.documentElement.classList.remove('page-loading');
+ document.documentElement.classList.add('page-ready');
+ const shell = document.querySelector('.profile-shell');
+ if (shell) shell.setAttribute('aria-busy', 'false');
+}
 async function start(){
  if(!$('profile')||document.body.dataset.preview==='true')return;
+ const shell = document.querySelector('.profile-shell');
+ if (shell) shell.setAttribute('aria-busy', 'true');
  const params=new URLSearchParams(location.search);
  const explicitUser=params.has('user');
  let settings={defaultUser:'Jacob7179'};
  try{const r=await fetch('site.json',{cache:'no-store'});if(r.ok)settings=await r.json()}catch{}
  const user=explicitUser?(params.get('user')||'').trim():(settings.defaultUser||'Jacob7179');
- // The default profile is bundled too, so the homepage always works even if
- // Jacob7179/page has not been created or the GitHub API cannot be reached.
- if(!explicitUser){
-   try{render(await getDefault());clearStatus();if($('owner-info'))$('owner-info').textContent='GitHub · '+user}catch(err){showStatus(err.message,true)}
- }
- if(user){
-   if(explicitUser)showStatus('Loading GitHub profile…');
-   try{
-     const {profile,repoBase}=await getGitHubProfile(user);
-     render(profile,repoBase);clearStatus();
-     if($('owner-info'))$('owner-info').textContent='GitHub · '+user;
-   }catch(err){
-     if(explicitUser){showStatus(err.message,true);$('links').replaceChildren();$('socials').replaceChildren();$('name').textContent='Profile unavailable';$('handle').textContent='@'+user;$('bio').textContent='Open the default page or try another GitHub username.'}
-     else clearStatus(); // Keep the bundled Jacob7179 sample as a fallback.
+ try {
+   // Resolve remote preferences before rendering: never flash the bundled profile
+   // and replace it moments later with a different user.
+   if(user){
+     try {
+       const {profile,repoBase}=await getGitHubProfile(user);
+       // The unqualified homepage uses config.json as the authority for
+       // site-owned footer visibility, even when a GitHub profile is loaded.
+       // Explicit ?user=... pages continue to honor each user's preference.js.
+       if (!explicitUser) {
+         try {
+           const defaultConfig = await getDefault();
+           if (typeof defaultConfig.showFooter === 'boolean') {
+             profile.showFooter = defaultConfig.showFooter;
+           }
+         } catch (error) {
+           console.warn('Unable to load local footer setting:', error);
+         }
+       }
+       render(profile,repoBase);
+       clearStatus();
+       if($('owner-info'))$('owner-info').textContent='GitHub · '+user;
+     } catch(err) {
+       if(explicitUser){
+         clearStatus();
+         $('links').replaceChildren();$('socials').replaceChildren();
+         $('name').textContent='Profile unavailable';$('handle').textContent='@'+user;
+         $('bio').textContent='Open the default page or try another GitHub username.';
+         showStatus(err.message,true);
+       } else {
+         // Default profile still works when GitHub is unavailable.
+         try{render(await getDefault());clearStatus();if($('owner-info'))$('owner-info').textContent='GitHub · '+user}
+         catch(fallbackError){showStatus(fallbackError.message,true)}
+       }
+     }
+   } else if(explicitUser) {
+     $('name').textContent='Profile unavailable';
+     $('handle').textContent='';$('bio').textContent='';
+     $('links').replaceChildren();$('socials').replaceChildren();
+     showStatus('Enter a valid GitHub username.',true);
+   } else {
+     render(await getDefault());clearStatus();
    }
- }else if(explicitUser){showStatus('Enter a valid GitHub username.',true)}
+ } catch(err) {showStatus(err.message||'Unable to load this page.',true)}
+ finally {await revealPage()}
 }
-start();
+start().catch(() => {
+ document.documentElement.classList.remove('page-loading');
+ document.documentElement.classList.add('page-ready');
+});
