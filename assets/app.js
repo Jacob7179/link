@@ -15,7 +15,8 @@ function assetURL(value,repoBase=''){
  const pieces=s.split('/');if(pieces.some(x=>!x||x==='.'||x==='..'||/[\u0000-\u001F\u007F<>:"|*]/u.test(x)))return '';
  return new URL(pieces.map(encodeURIComponent).join('/'),repoBase||new URL('./',location.href)).href;
 }
-function stylesheet(href,key){let e=document.getElementById(key);if(e)e.remove();if(!href)return;e=document.createElement('link');e.id=key;e.rel='stylesheet';e.href=href;document.head.append(e)}
+function freshAsset(url){if(!url || url.startsWith('data:'))return url;try{const u=new URL(url,location.href);if(!['http:','https:'].includes(u.protocol))return url;u.searchParams.set('_pageFresh',String(Date.now()));return u.href}catch{return url}}
+function stylesheet(href,key){let e=document.getElementById(key);if(e)e.remove();if(!href)return;e=document.createElement('link');e.id=key;e.rel='stylesheet';e.href=freshAsset(href);document.head.append(e)}
 function icon(node,symbol,path,base){
  // A filename in `icon` is a real image path, including names with spaces.
  // Explicit iconPath takes priority, then icon-as-path, then the default icon.
@@ -24,7 +25,7 @@ function icon(node,symbol,path,base){
  const src=assetURL(selected,base);
  node.replaceChildren();
  if(src){
-  const im=document.createElement('img');im.src=src;im.alt='';im.loading='lazy';im.referrerPolicy='no-referrer';
+  const im=document.createElement('img');im.src=freshAsset(src);im.alt='';im.loading='lazy';im.referrerPolicy='no-referrer';
   im.addEventListener('error',()=>{im.remove();node.classList.remove('has-image');node.textContent='↗'},{once:true});
   node.classList.add('has-image');node.append(im);
  }else{node.classList.remove('has-image');node.textContent=isImagePath(symbol)?'↗':symbol||'↗'}
@@ -33,6 +34,7 @@ function applyTheme(c,base){
  const t=themes[c.theme]||themes.lavender;const color=c.colors||{};
  const vars={'--bg':safeColor(color.background)||t[0],'--bg2':safeColor(color.background2)||t[1],'--accent':safeColor(color.accent)||t[2],'--card':safeColor(color.card)||t[3],'--ink':safeColor(color.text)||(c.theme==='midnight'?'#f5f5ff':'#242135'),'--muted':safeColor(color.muted)||(c.theme==='midnight'?'#aeb7ce':'#77738a')};
  for(const [k,v] of Object.entries(vars))document.documentElement.style.setProperty(k,v);
+ document.body.dataset.avatarFrame=c.avatarFrame===false?'off':'on';
  document.body.dataset.shape=['rounded','pill','square'].includes(c.shape)?c.shape:'rounded';document.body.dataset.background=['gradient','solid','image'].includes(c.background)?c.background:'gradient';
  const d=c.design||{},typ=c.typography||{};
  document.body.dataset.cardStyle=['glass','solid','outline','minimal','neon'].includes(d.cardStyle)?d.cardStyle:'glass';
@@ -43,14 +45,14 @@ function applyTheme(c,base){
  document.documentElement.style.setProperty('--profile-font',allowedFonts[typ.fontFamily]||allowedFonts['DM Sans']);
  let fontEl=document.getElementById('blog-custom-font');if(fontEl)fontEl.remove();
  const font=assetURL(typ.customFontPath,base);if(font&&/\.(woff2?|ttf|otf)(?:$|\?)/i.test(font)){
-   fontEl=document.createElement('style');fontEl.id='blog-custom-font';fontEl.textContent='@font-face{font-family:"BlogCustom";src:url("'+font.replace(/"/g,'%22')+'");font-display:swap}';document.head.append(fontEl);document.documentElement.style.setProperty('--profile-font','"BlogCustom",system-ui,sans-serif');
+   fontEl=document.createElement('style');fontEl.id='blog-custom-font';fontEl.textContent='@font-face{font-family:"BlogCustom";src:url("'+freshAsset(font).replace(/"/g,'%22')+'");font-display:swap}';document.head.append(fontEl);document.documentElement.style.setProperty('--profile-font','"BlogCustom",system-ui,sans-serif');
  }
  const background=assetURL(d.backgroundImage||(c.assets||{}).backgroundPath,base);
- document.documentElement.style.setProperty('--background-image',background?'url("'+background.replace(/"/g,'%22')+'")':'none');
+ document.documentElement.style.setProperty('--background-image',background?'url("'+freshAsset(background).replace(/"/g,'%22')+'")':'none');
  document.documentElement.style.setProperty('--background-position',(['center','top','bottom','left','right'].includes(d.backgroundImagePosition)?d.backgroundImagePosition:'center'));
  document.documentElement.style.setProperty('--background-size',(['cover','contain','auto'].includes(d.backgroundImageSize)?d.backgroundImageSize:'cover'));
  stylesheet(assetURL(d.cardStylePath,base),'blog-card-custom-css');stylesheet(assetURL(d.customCSS,base),'blog-custom-css');
- const favicon=assetURL((c.assets||{}).faviconPath,base);let fav=document.querySelector('link[rel="icon"]');if(!fav){fav=document.createElement('link');fav.rel='icon';document.head.append(fav)}if(favicon)fav.href=favicon;else fav.removeAttribute('href');
+ const favicon=assetURL((c.assets||{}).faviconPath,base);let fav=document.querySelector('link[rel="icon"]');if(!fav){fav=document.createElement('link');fav.rel='icon';document.head.append(fav)}if(favicon)fav.href=freshAsset(favicon);else fav.removeAttribute('href');
  // Global social-icon background: custom shape/color, with a transparent off state.
  const social=c.socialStyle||{};
  document.body.dataset.socialBackground=social.backgroundEnabled===true?'on':'off';
@@ -141,7 +143,7 @@ function render(c,base=''){
   const a=document.createElement('a');a.className='link-card';a.href=safeUrl(l.url||'');if(a.href.startsWith('http')){a.target='_blank';a.rel='noopener noreferrer'}
   const ic=document.createElement('span');ic.className='link-icon';icon(ic,l.icon||'↗',l.iconPath||(c.assets||{}).defaultCardIconPath,base);
   const txt=document.createElement('span');txt.className='link-copy';const strong=document.createElement('strong');strong.textContent=l.title||'Untitled link';const small=document.createElement('small');small.textContent=l.subtitle||'';txt.append(strong,small);
-  const pic=assetURL(l.imagePath,base);if(pic){const img=document.createElement('img');img.className='card-image';img.src=pic;img.alt='';img.loading='lazy';img.referrerPolicy='no-referrer';a.append(img)}
+  const pic=assetURL(l.imagePath,base);if(pic){const img=document.createElement('img');img.className='card-image';img.src=freshAsset(pic);img.alt='';img.loading='lazy';img.referrerPolicy='no-referrer';a.append(img)}
   const arrow=document.createElement('span');arrow.className='arrow';arrow.textContent='↗';a.append(ic,txt,arrow);
   if(l.stylePath){const css=assetURL(l.stylePath,base);if(css&&/\.css(?:$|\?)/i.test(css)){const key='blog-card-'+[...(l.stylePath||'')].reduce((n,ch)=>(n*31+ch.charCodeAt(0))>>>0,7);stylesheet(css,key);a.dataset.variant='custom'}else if(/^[\w-]{1,32}$/.test(l.stylePath))a.dataset.variant=l.stylePath}
   $('links').append(a)
@@ -157,7 +159,7 @@ function render(c,base=''){
  setupMusic(c,base)
 }
 const validGitHubUser=name=>/^[a-z\d](?:[a-z\d-]{0,37}[a-z\d])?$/i.test(name)&&!name.includes('--');
-async function getJson(url){const response=await fetch(url,{headers:{Accept:'application/vnd.github+json'}});if(!response.ok){if([403,429].includes(response.status))throw Error('GitHub API limit reached. Try again later.');if(response.status===404)throw Error('GitHub user or page repository not found.');throw Error('GitHub API request failed ('+response.status+').')}return response.json()}
+async function getJson(url){const response=await fetch(url,{cache:'no-store',headers:{Accept:'application/vnd.github+json'}});if(!response.ok){if([403,429].includes(response.status))throw Error('GitHub API limit reached. Try again later.');if(response.status===404)throw Error('GitHub user or page repository not found.');throw Error('GitHub API request failed ('+response.status+').')}return response.json()}
 async function getDefault(){const r=await fetch('config.json',{cache:'no-store'});if(!r.ok)throw Error('Could not load config.json');return r.json()}
 function parsePreference(source){const m=source.trim().match(/^(?:const|let|var)\s+preference\s*=\s*([\s\S]*?)\s*;?\s*$/);if(!m)throw Error('Invalid preference.js format.');let json=m[1].trim();if(json.endsWith(';'))json=json.slice(0,-1).trim();let c;try{c=JSON.parse(json)}catch{throw Error('preference.js must contain strict JSON.')}if(!c||typeof c!=='object'||!Array.isArray(c.links)||!Array.isArray(c.socials))throw Error('Missing links or socials.');return c}
 async function getGitHubProfile(username){
@@ -217,8 +219,12 @@ async function start(){
        if (!explicitUser) {
          try {
            const defaultConfig = await getDefault();
-           if (typeof defaultConfig.showFooter === 'boolean') {
-             profile.showFooter = defaultConfig.showFooter;
+           // Site-owned appearance switches take precedence on the default URL.
+           // Explicit ?user=xxx URLs always use that user's preference.js.
+           for (const key of ['showFooter', 'avatarFrame']) {
+             if (typeof defaultConfig[key] === 'boolean') {
+               profile[key] = defaultConfig[key];
+             }
            }
          } catch (error) {
            console.warn('Unable to load local footer setting:', error);

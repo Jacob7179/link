@@ -128,5 +128,6 @@ const preference = {
     "shape": "rounded",
     "backgroundColor": "#ffffff"
   },
-  "showFooter": false
+  "showFooter": false,
+  "avatarFrame": false
 };

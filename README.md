@@ -278,3 +278,17 @@ See [`LICENSE`](LICENSE) for the project's license terms.
 ## Hide or show the footer
 
 In `editor.html`, open **08 · Footer** and toggle **Show footer**. This is reflected in the live preview and in exported `config.json` and `preference.js`. Alternatively, set `"showFooter": false` at the top level of your profile preferences to hide the “Made with ♥ · GitHub · Customize · Default page” footer. The default is visible when the option is missing.
+
+
+### Footer visibility
+
+Set `"showFooter": false` in `config.json` to hide the footer on `/page/`. The default homepage honors this setting even when a remote GitHub profile is displayed. For a direct `?user=xxx` profile, set `"showFooter": false` in that user's `preference.js`. The bundled `preference.js` also has the footer disabled by default.
+
+### Profile photo frame
+
+In **editor.html → 01 · Your profile**, turn **Show profile photo frame** on or off. This is stored as `"avatarFrame": true` or `false` in `config.json` and the exported `preference.js`. When omitted, the frame remains enabled for backwards compatibility. Turning it off removes the avatar’s white ring and drop shadow without changing the image shape.
+
+
+## Cache behavior
+
+The page requests a fresh version of its CSS, JavaScript, profile configuration, and profile image assets on each navigation. The GitHub API and raw `preference.js` requests use `cache: no-store`. This does not control GitHub Pages/CDN response headers or guarantee that the HTML document itself cannot be cached by upstream services. For a strict `Cache-Control: no-store` response header, use hosting that allows custom HTTP headers.

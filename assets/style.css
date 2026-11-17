@@ -62,3 +62,11 @@ html.page-ready .profile{animation:profile-appear .7s cubic-bezier(.2,.7,.2,1) b
 
 /* Keep the footer hidden until the profile explicitly enables it. */
 #page-footer[hidden] { display: none !important; }
+
+/* Avatar border is optional, and the disabled state must win over theme CSS. */
+body[data-avatar-frame="off"] #avatar.avatar {
+  border: 0 !important;
+  outline: 0 !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
