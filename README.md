@@ -302,3 +302,10 @@ In **link Studio → 09 · Drag & selection**, enable **Disable dragging and tex
 ```
 
 This restricts text selection and drag gestures within the public profile across Android, iOS/iPadOS, macOS, and Windows browsers. Link tapping and page scrolling remain enabled. It does not prevent screenshots, copying via developer tools, or all OS-level gesture actions.
+
+### Android long-press restrictions
+When `interactionStyle.disableDragSelect` is `true`, the public profile suppresses
+`contextmenu`, `selectstart`, and `dragstart` browser defaults on links, text, and images.
+Images and links are set `draggable=false`. Normal tap navigation and touch scrolling
+are left intact. Android browser and OS long-press behavior differs by device; these
+settings discourage selection but do not block every browser action or save/copy method.
