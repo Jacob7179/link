@@ -25,7 +25,7 @@ function icon(node,symbol,path,base){
  const src=assetURL(selected,base);
  node.replaceChildren();
  if(src){
-  const im=document.createElement('img');im.draggable=false;im.src=freshAsset(src);im.alt='';im.loading='lazy';im.referrerPolicy='no-referrer';
+  const im=document.createElement('img');im.src=freshAsset(src);im.alt='';im.loading='lazy';im.referrerPolicy='no-referrer';
   im.addEventListener('error',()=>{im.remove();node.classList.remove('has-image');node.textContent='↗'},{once:true});
   node.classList.add('has-image');node.append(im);
  }else{node.classList.remove('has-image');node.textContent=isImagePath(symbol)?'↗':symbol||'↗'}
@@ -141,15 +141,15 @@ function render(c,base=''){
  $('name').textContent=c.name||'Your Name';$('handle').textContent=c.handle||'@yourhandle';$('bio').textContent=c.bio||'';document.title=(c.name||'My Links')+' · link';
  const av=$('avatar');icon(av,(c.name||'YN').split(/\s+/).slice(0,2).map(x=>x[0]||'').join('').toUpperCase(),(c.assets||{}).avatarPath||c.avatar,base);
  $('links').replaceChildren();(Array.isArray(c.links)?c.links:[]).filter(l=>l&&l.enabled!==false).forEach(l=>{
-  const a=document.createElement('a');a.draggable=false;a.className='link-card';a.href=safeUrl(l.url||'');if(a.href.startsWith('http')){a.target='_blank';a.rel='noopener noreferrer'}
+  const a=document.createElement('a');a.className='link-card';a.href=safeUrl(l.url||'');if(a.href.startsWith('http')){a.target='_blank';a.rel='noopener noreferrer'}
   const ic=document.createElement('span');ic.className='link-icon';icon(ic,l.icon||'↗',l.iconPath||(c.assets||{}).defaultCardIconPath,base);
   const txt=document.createElement('span');txt.className='link-copy';const strong=document.createElement('strong');strong.textContent=l.title||'Untitled link';const small=document.createElement('small');small.textContent=l.subtitle||'';txt.append(strong,small);
-  const pic=assetURL(l.imagePath,base);if(pic){const img=document.createElement('img');img.draggable=false;img.className='card-image';img.src=freshAsset(pic);img.alt='';img.loading='lazy';img.referrerPolicy='no-referrer';a.append(img)}
+  const pic=assetURL(l.imagePath,base);if(pic){const img=document.createElement('img');img.className='card-image';img.src=freshAsset(pic);img.alt='';img.loading='lazy';img.referrerPolicy='no-referrer';a.append(img)}
   const arrow=document.createElement('span');arrow.className='arrow';arrow.textContent='↗';a.append(ic,txt,arrow);
   if(l.stylePath){const css=assetURL(l.stylePath,base);if(css&&/\.css(?:$|\?)/i.test(css)){const key='link-card-'+[...(l.stylePath||'')].reduce((n,ch)=>(n*31+ch.charCodeAt(0))>>>0,7);stylesheet(css,key);a.dataset.variant='custom'}else if(/^[\w-]{1,32}$/.test(l.stylePath))a.dataset.variant=l.stylePath}
   $('links').append(a)
  });
- $('socials').replaceChildren();(Array.isArray(c.socials)?c.socials:[]).filter(Boolean).forEach(s=>{const a=document.createElement('a');a.draggable=false;a.href=safeUrl(s.url||'');a.title=s.label||'Social link';a.setAttribute('aria-label',s.label||'Social link');icon(a,s.icon||'↗',s.iconPath,base);if(a.href.startsWith('http')){a.target='_blank';a.rel='noopener noreferrer'}$('socials').append(a)});
+ $('socials').replaceChildren();(Array.isArray(c.socials)?c.socials:[]).filter(Boolean).forEach(s=>{const a=document.createElement('a');a.href=safeUrl(s.url||'');a.title=s.label||'Social link';a.setAttribute('aria-label',s.label||'Social link');icon(a,s.icon||'↗',s.iconPath,base);if(a.href.startsWith('http')){a.target='_blank';a.rel='noopener noreferrer'}$('socials').append(a)});
  const footer = document.getElementById('page-footer');
   if (footer) {
     // Explicitly show only when this profile allows the footer.
