@@ -70,3 +70,16 @@ body[data-avatar-frame="off"] #avatar.avatar {
   box-shadow: none !important;
   padding: 0 !important;
 }
+
+/* Optional cross-platform drag and selection restriction: public profile only. */
+body[data-disable-drag-select="on"] #profile,
+body[data-disable-drag-select="on"] #profile * {
+ -webkit-user-select: none !important;
+ -moz-user-select: none !important;
+ user-select: none !important;
+ -webkit-touch-callout: none;
+}
+body[data-disable-drag-select="on"] #profile img,
+body[data-disable-drag-select="on"] #profile a {
+ -webkit-user-drag: none !important;
+}

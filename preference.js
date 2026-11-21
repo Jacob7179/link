@@ -129,5 +129,8 @@ const preference = {
     "backgroundColor": "#ffffff"
   },
   "showFooter": false,
-  "avatarFrame": false
+  "avatarFrame": false,
+  "interactionStyle": {
+    "disableDragSelect": true
+  }
 };

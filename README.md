@@ -292,3 +292,13 @@ In **editor.html → 01 · Your profile**, turn **Show profile photo frame** on 
 ## Cache behavior
 
 The page requests a fresh version of its CSS, JavaScript, profile configuration, and profile image assets on each navigation. The GitHub API and raw `preference.js` requests use `cache: no-store`. This does not control GitHub Pages/CDN response headers or guarantee that the HTML document itself cannot be cached by upstream services. For a strict `Cache-Control: no-store` response header, use hosting that allows custom HTTP headers.
+
+## Drag and selection controls
+
+In **link Studio → 09 · Drag & selection**, enable **Disable dragging and text selection**. Export and publish your updated `preference.js` (or `config.json` for the bundled page). The setting is:
+
+```json
+"interactionStyle": { "disableDragSelect": true }
+```
+
+This restricts text selection and drag gestures within the public profile across Android, iOS/iPadOS, macOS, and Windows browsers. Link tapping and page scrolling remain enabled. It does not prevent screenshots, copying via developer tools, or all OS-level gesture actions.

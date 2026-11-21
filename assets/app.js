@@ -35,6 +35,7 @@ function applyTheme(c,base){
  const vars={'--bg':safeColor(color.background)||t[0],'--bg2':safeColor(color.background2)||t[1],'--accent':safeColor(color.accent)||t[2],'--card':safeColor(color.card)||t[3],'--ink':safeColor(color.text)||(c.theme==='midnight'?'#f5f5ff':'#242135'),'--muted':safeColor(color.muted)||(c.theme==='midnight'?'#aeb7ce':'#77738a')};
  for(const [k,v] of Object.entries(vars))document.documentElement.style.setProperty(k,v);
  document.body.dataset.avatarFrame=c.avatarFrame===false?'off':'on';
+ document.body.dataset.disableDragSelect=c.interactionStyle?.disableDragSelect===true?'on':'off';
  document.body.dataset.shape=['rounded','pill','square'].includes(c.shape)?c.shape:'rounded';document.body.dataset.background=['gradient','solid','image'].includes(c.background)?c.background:'gradient';
  const d=c.design||{},typ=c.typography||{};
  document.body.dataset.cardStyle=['glass','solid','outline','minimal','neon'].includes(d.cardStyle)?d.cardStyle:'glass';
@@ -261,3 +262,8 @@ start().catch(() => {
  document.documentElement.classList.remove('page-loading');
  document.documentElement.classList.add('page-ready');
 });
+
+// Dragging is independent of normal clicks, tapping and touch scrolling.
+document.addEventListener('dragstart',event=>{
+ if(document.body.dataset.disableDragSelect==='on' && event.target.closest('#profile'))event.preventDefault();
+},true);
