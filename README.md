@@ -1,23 +1,23 @@
-# page
+# link
 
 **A customizable, multi-user link-in-bio website for GitHub Pages.**
 
-`page` is a static alternative to a Linktree-style profile. It displays profile details, link cards, social icons, and an optional music player. Visitors can view the bundled default page or load another GitHub user's public `page` repository using `?user=USERNAME`.
+`link` is a static alternative to a Linktree-style profile. It displays profile details, link cards, social icons, and an optional music player. Visitors can view the bundled default page or load another GitHub user's public `link` repository using `?user=USERNAME`.
 
 No server, database, account system, Node.js, or build command is required.
 
 ## Demo URLs
 
-Once deployed from `Jacob7179/page`:
+Once deployed from `Jacob7179/link`:
 
 | URL | Purpose |
 | --- | --- |
-| `https://jacob7179.github.io/page/` | Default page (Jacob7179) |
-| `https://jacob7179.github.io/page/?user=Jacob7179` | Load Jacob7179's published GitHub preferences |
-| `https://jacob7179.github.io/page/?user=USERNAME` | Load another GitHub user's published preferences |
-| `https://jacob7179.github.io/page/editor.html` | Visual editor with live preview |
+| `https://jacob7179.github.io/link/` | Default page (Jacob7179) |
+| `https://jacob7179.github.io/link/?user=Jacob7179` | Load Jacob7179's published GitHub preferences |
+| `https://jacob7179.github.io/link/?user=USERNAME` | Load another GitHub user's published preferences |
+| `https://jacob7179.github.io/link/editor.html` | Visual editor with live preview |
 
-> These are expected URLs after GitHub Pages is enabled. An account must have a public repository named `page`, containing a valid `preference.js`, for the multi-user lookup to work.
+> These are expected URLs after GitHub Pages is enabled. An account must have a public repository named `link`, containing a valid `preference.js`, for the multi-user lookup to work.
 
 ## Features
 
@@ -33,7 +33,7 @@ Once deployed from `Jacob7179/page`:
 ## Project structure
 
 ```text
-page/
+link/
 ├── index.html                    # Public profile page
 ├── editor.html                   # Visual editor
 ├── preview.html                  # Embedded live preview
@@ -54,11 +54,11 @@ page/
 
 ## Deploy to GitHub Pages
 
-1. Create a **public** GitHub repository named `page` (or use the existing `Jacob7179/page` repository).
+1. Create a **public** GitHub repository named `link` (or use the existing `Jacob7179/link` repository).
 2. Upload **the contents of this project** directly into the repository root. `index.html` must be at the root, not inside another nested folder.
 3. Open the repository's **Settings → Pages**.
 4. Under **Build and deployment**, select **GitHub Actions**. The included `.github/workflows/static.yml` deploys the site whenever `main` receives a push; you can also run it manually from **Actions**.
-5. Check the **Actions** tab for a successful deployment, then visit `https://YOUR-USERNAME.github.io/page/`.
+5. Check the **Actions** tab for a successful deployment, then visit `https://YOUR-USERNAME.github.io/link/`.
 
 The included workflow watches the `main` branch. If your branch has another name, update `branches: ["main"]` inside `.github/workflows/static.yml`.
 
@@ -80,13 +80,13 @@ Edit **`site.json`** to configure which GitHub profile is loaded by default:
 
 ```json
 {
-  "profileRepository": "page",
+  "profileRepository": "link",
   "preferenceFile": "preference.js",
   "defaultUser": "Jacob7179"
 }
 ```
 
-**Important:** The home page first renders `config.json`, then attempts to load `Jacob7179/page/preference.js`. If that GitHub lookup succeeds, the remote preference **overrides the bundled profile**. If it fails, the bundled default stays visible. To keep the default page consistent, update both `config.json` in the central site and the default account's `preference.js`.
+**Important:** The home page first renders `config.json`, then attempts to load `Jacob7179/link/preference.js`. If that GitHub lookup succeeds, the remote preference **overrides the bundled profile**. If it fails, the bundled default stays visible. To keep the default page consistent, update both `config.json` in the central site and the default account's `preference.js`.
 
 When a visitor explicitly requests `?user=USERNAME`, the website loads that GitHub account's preference. An invalid/missing account or repository shows an unavailable-profile message, not another user's fallback.
 
@@ -113,10 +113,10 @@ After exporting, upload the file to the correct repository and commit the change
 
 ## Multi-user profile publishing
 
-Every user who wants a page needs a **public GitHub repository called `page`** with a `preference.js` at its root. For example:
+Every user who wants a page needs a **public GitHub repository called `link`** with a `preference.js` at its root. For example:
 
 ```text
-USERNAME/page/
+USERNAME/link/
 ├── preference.js
 └── assets/
     ├── icons/
@@ -130,7 +130,7 @@ USERNAME/page/
 Visitors then open:
 
 ```text
-https://jacob7179.github.io/page/?user=USERNAME
+https://jacob7179.github.io/link/?user=USERNAME
 ```
 
 The site checks the public account and repository via GitHub's API, reads `preference.js` from the repository's **default branch**, and loads relative asset paths from the **same user's repository**. Public GitHub API requests can be rate-limited.
@@ -253,7 +253,7 @@ YouTube playback uses a visible embedded video player; this project does not pro
 
 ## Troubleshooting
 
-**A profile says unavailable:** Check the GitHub username, public `USERNAME/page` repository, presence of `preference.js` on its default branch, and valid JSON syntax inside `const preference = { ... };`. GitHub API rate limits can also affect loading.
+**A profile says unavailable:** Check the GitHub username, public `USERNAME/link` repository, presence of `preference.js` on its default branch, and valid JSON syntax inside `const preference = { ... };`. GitHub API rate limits can also affect loading.
 
 **An icon shows an arrow:** Check filename spelling, case, extension (including accidental `.jpg.jpg`), folder, and GitHub public accessibility. Look for a `404` image request in the browser's Developer Tools → Network panel.
 
@@ -282,7 +282,7 @@ In `editor.html`, open **08 · Footer** and toggle **Show footer**. This is refl
 
 ### Footer visibility
 
-Set `"showFooter": false` in `config.json` to hide the footer on `/page/`. The default homepage honors this setting even when a remote GitHub profile is displayed. For a direct `?user=xxx` profile, set `"showFooter": false` in that user's `preference.js`. The bundled `preference.js` also has the footer disabled by default.
+Set `"showFooter": false` in `config.json` to hide the footer on `/link/`. The default homepage honors this setting even when a remote GitHub profile is displayed. For a direct `?user=xxx` profile, set `"showFooter": false` in that user's `preference.js`. The bundled `preference.js` also has the footer disabled by default.
 
 ### Profile photo frame
 

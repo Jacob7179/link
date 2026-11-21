@@ -1,4 +1,4 @@
-/* page: GitHub Pages multi-profile rendering; preference.js is parsed as JSON, NEVER executed. */
+/* link: GitHub Pages multi-profile rendering; preference.js is parsed as JSON, NEVER executed. */
 const themes={lavender:['#f0eaff','#dcd2ff','#6e52b6','#ffffff'],peach:['#fff1e8','#ffd9c6','#ae5e42','#ffffff'],mint:['#e5f8f0','#bdebd9','#26745c','#ffffff'],sky:['#e7f3ff','#c4dfff','#3568a4','#ffffff'],midnight:['#141827','#242d48','#b4c8ff','#222b43']};
 const $=id=>document.getElementById(id);
 const defaults={design:{},colors:{},typography:{},assets:{},music:{}};
@@ -15,7 +15,7 @@ function assetURL(value,repoBase=''){
  const pieces=s.split('/');if(pieces.some(x=>!x||x==='.'||x==='..'||/[\u0000-\u001F\u007F<>:"|*]/u.test(x)))return '';
  return new URL(pieces.map(encodeURIComponent).join('/'),repoBase||new URL('./',location.href)).href;
 }
-function freshAsset(url){if(!url || url.startsWith('data:'))return url;try{const u=new URL(url,location.href);if(!['http:','https:'].includes(u.protocol))return url;u.searchParams.set('_pageFresh',String(Date.now()));return u.href}catch{return url}}
+function freshAsset(url){if(!url || url.startsWith('data:'))return url;try{const u=new URL(url,location.href);if(!['http:','https:'].includes(u.protocol))return url;u.searchParams.set('_linkFresh',String(Date.now()));return u.href}catch{return url}}
 function stylesheet(href,key){let e=document.getElementById(key);if(e)e.remove();if(!href)return;e=document.createElement('link');e.id=key;e.rel='stylesheet';e.href=freshAsset(href);document.head.append(e)}
 function icon(node,symbol,path,base){
  // A filename in `icon` is a real image path, including names with spaces.
@@ -43,15 +43,15 @@ function applyTheme(c,base){
  for(const [k,v,f] of [['--name-size',typ.nameSize,29],['--bio-size',typ.bioSize,15],['--card-title-size',typ.cardTitleSize,15],['--card-subtitle-size',typ.cardSubtitleSize,12]])document.documentElement.style.setProperty(k,number(v,f,9,70)+'px');
  const allowedFonts={'DM Sans':'"DM Sans",system-ui,sans-serif','system':'system-ui,sans-serif','serif':'Georgia,serif','monospace':'ui-monospace,monospace'};
  document.documentElement.style.setProperty('--profile-font',allowedFonts[typ.fontFamily]||allowedFonts['DM Sans']);
- let fontEl=document.getElementById('blog-custom-font');if(fontEl)fontEl.remove();
+ let fontEl=document.getElementById('link-custom-font');if(fontEl)fontEl.remove();
  const font=assetURL(typ.customFontPath,base);if(font&&/\.(woff2?|ttf|otf)(?:$|\?)/i.test(font)){
-   fontEl=document.createElement('style');fontEl.id='blog-custom-font';fontEl.textContent='@font-face{font-family:"BlogCustom";src:url("'+freshAsset(font).replace(/"/g,'%22')+'");font-display:swap}';document.head.append(fontEl);document.documentElement.style.setProperty('--profile-font','"BlogCustom",system-ui,sans-serif');
+   fontEl=document.createElement('style');fontEl.id='link-custom-font';fontEl.textContent='@font-face{font-family:"LinkCustom";src:url("'+freshAsset(font).replace(/"/g,'%22')+'");font-display:swap}';document.head.append(fontEl);document.documentElement.style.setProperty('--profile-font','"LinkCustom",system-ui,sans-serif');
  }
  const background=assetURL(d.backgroundImage||(c.assets||{}).backgroundPath,base);
  document.documentElement.style.setProperty('--background-image',background?'url("'+freshAsset(background).replace(/"/g,'%22')+'")':'none');
  document.documentElement.style.setProperty('--background-position',(['center','top','bottom','left','right'].includes(d.backgroundImagePosition)?d.backgroundImagePosition:'center'));
  document.documentElement.style.setProperty('--background-size',(['cover','contain','auto'].includes(d.backgroundImageSize)?d.backgroundImageSize:'cover'));
- stylesheet(assetURL(d.cardStylePath,base),'blog-card-custom-css');stylesheet(assetURL(d.customCSS,base),'blog-custom-css');
+ stylesheet(assetURL(d.cardStylePath,base),'link-card-custom-css');stylesheet(assetURL(d.customCSS,base),'link-custom-css');
  const favicon=assetURL((c.assets||{}).faviconPath,base);let fav=document.querySelector('link[rel="icon"]');if(!fav){fav=document.createElement('link');fav.rel='icon';document.head.append(fav)}if(favicon)fav.href=freshAsset(favicon);else fav.removeAttribute('href');
  // Global social-icon background: custom shape/color, with a transparent off state.
  const social=c.socialStyle||{};
@@ -137,7 +137,7 @@ function setupMusic(c,base){
 function render(c,base=''){
  if(!c||typeof c!=='object')return;
  applyTheme(c,base);
- $('name').textContent=c.name||'Your Name';$('handle').textContent=c.handle||'@yourhandle';$('bio').textContent=c.bio||'';document.title=(c.name||'My Links')+' · page';
+ $('name').textContent=c.name||'Your Name';$('handle').textContent=c.handle||'@yourhandle';$('bio').textContent=c.bio||'';document.title=(c.name||'My Links')+' · link';
  const av=$('avatar');icon(av,(c.name||'YN').split(/\s+/).slice(0,2).map(x=>x[0]||'').join('').toUpperCase(),(c.assets||{}).avatarPath||c.avatar,base);
  $('links').replaceChildren();(Array.isArray(c.links)?c.links:[]).filter(l=>l&&l.enabled!==false).forEach(l=>{
   const a=document.createElement('a');a.className='link-card';a.href=safeUrl(l.url||'');if(a.href.startsWith('http')){a.target='_blank';a.rel='noopener noreferrer'}
@@ -145,7 +145,7 @@ function render(c,base=''){
   const txt=document.createElement('span');txt.className='link-copy';const strong=document.createElement('strong');strong.textContent=l.title||'Untitled link';const small=document.createElement('small');small.textContent=l.subtitle||'';txt.append(strong,small);
   const pic=assetURL(l.imagePath,base);if(pic){const img=document.createElement('img');img.className='card-image';img.src=freshAsset(pic);img.alt='';img.loading='lazy';img.referrerPolicy='no-referrer';a.append(img)}
   const arrow=document.createElement('span');arrow.className='arrow';arrow.textContent='↗';a.append(ic,txt,arrow);
-  if(l.stylePath){const css=assetURL(l.stylePath,base);if(css&&/\.css(?:$|\?)/i.test(css)){const key='blog-card-'+[...(l.stylePath||'')].reduce((n,ch)=>(n*31+ch.charCodeAt(0))>>>0,7);stylesheet(css,key);a.dataset.variant='custom'}else if(/^[\w-]{1,32}$/.test(l.stylePath))a.dataset.variant=l.stylePath}
+  if(l.stylePath){const css=assetURL(l.stylePath,base);if(css&&/\.css(?:$|\?)/i.test(css)){const key='link-card-'+[...(l.stylePath||'')].reduce((n,ch)=>(n*31+ch.charCodeAt(0))>>>0,7);stylesheet(css,key);a.dataset.variant='custom'}else if(/^[\w-]{1,32}$/.test(l.stylePath))a.dataset.variant=l.stylePath}
   $('links').append(a)
  });
  $('socials').replaceChildren();(Array.isArray(c.socials)?c.socials:[]).filter(Boolean).forEach(s=>{const a=document.createElement('a');a.href=safeUrl(s.url||'');a.title=s.label||'Social link';a.setAttribute('aria-label',s.label||'Social link');icon(a,s.icon||'↗',s.iconPath,base);if(a.href.startsWith('http')){a.target='_blank';a.rel='noopener noreferrer'}$('socials').append(a)});
@@ -164,7 +164,7 @@ async function getDefault(){const r=await fetch('config.json',{cache:'no-store'}
 function parsePreference(source){const m=source.trim().match(/^(?:const|let|var)\s+preference\s*=\s*([\s\S]*?)\s*;?\s*$/);if(!m)throw Error('Invalid preference.js format.');let json=m[1].trim();if(json.endsWith(';'))json=json.slice(0,-1).trim();let c;try{c=JSON.parse(json)}catch{throw Error('preference.js must contain strict JSON.')}if(!c||typeof c!=='object'||!Array.isArray(c.links)||!Array.isArray(c.socials))throw Error('Missing links or socials.');return c}
 async function getGitHubProfile(username){
  if(!validGitHubUser(username))throw Error('Invalid GitHub username.');
- const settings=await fetch('site.json',{cache:'no-store'}).then(r=>{if(!r.ok)throw Error('Could not load site.json');return r.json()});const repository=settings.profileRepository||'page';if(!/^[\w.-]{1,100}$/.test(repository))throw Error('Invalid repository name.');
+ const settings=await fetch('site.json',{cache:'no-store'}).then(r=>{if(!r.ok)throw Error('Could not load site.json');return r.json()});const repository=settings.profileRepository||'link';if(!/^[\w.-]{1,100}$/.test(repository))throw Error('Invalid repository name.');
  const api='https://api.github.com';const account=await getJson(`${api}/users/${encodeURIComponent(username)}`);if(account.type!=='User')throw Error('GitHub account must belong to a user.');
  const repo=await getJson(`${api}/repos/${encodeURIComponent(username)}/${encodeURIComponent(repository)}`);if(repo.private||repo.owner?.login?.toLowerCase()!==username.toLowerCase())throw Error('Profile repository must be public.');
  const filename=settings.preferenceFile||'preference.js';if(!/^[\w./-]+$/.test(filename)||filename.split('/').includes('..'))throw Error('Invalid preference file path.');
