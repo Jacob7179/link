@@ -227,6 +227,14 @@ async function start(){
                profile[key] = defaultConfig[key];
              }
            }
+           // Site-level interaction setting also controls the unqualified homepage.
+           // Without this, remote preference.js can override the editor's exported config.json.
+           if (typeof defaultConfig.interactionStyle?.disableDragSelect === 'boolean') {
+             profile.interactionStyle = {
+               ...(profile.interactionStyle || {}),
+               disableDragSelect: defaultConfig.interactionStyle.disableDragSelect
+             };
+           }
          } catch (error) {
            console.warn('Unable to load local footer setting:', error);
          }
