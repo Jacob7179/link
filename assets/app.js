@@ -15,7 +15,7 @@ function assetURL(value,repoBase=''){
  const pieces=s.split('/');if(pieces.some(x=>!x||x==='.'||x==='..'||/[\u0000-\u001F\u007F<>:"|*]/u.test(x)))return '';
  return new URL(pieces.map(encodeURIComponent).join('/'),repoBase||new URL('./',location.href)).href;
 }
-function freshAsset(url){if(!url || url.startsWith('data:'))return url;try{const u=new URL(url,location.href);if(!['http:','https:'].includes(u.protocol))return url;u.searchParams.set('_linkFresh',String(Date.now()));return u.href}catch{return url}}
+function freshAsset(url){if(!url || url.startsWith('data:'))return url;try{const u=new URL(url,location.href);if(!['http:','https:'].includes(u.protocol))return url;const version=String(window.LINK_ASSET_VERSION||'2026.11.24.1');u.searchParams.set('v',version);return u.href}catch{return url}}
 function stylesheet(href,key){let e=document.getElementById(key);if(e)e.remove();if(!href)return;e=document.createElement('link');e.id=key;e.rel='stylesheet';e.href=freshAsset(href);document.head.append(e)}
 function icon(node,symbol,path,base){
  // A filename in `icon` is a real image path, including names with spaces.
@@ -191,7 +191,10 @@ async function waitForVisibleImages(maxWaitMs = 2800) {
  await Promise.race([ready, new Promise(resolve => setTimeout(resolve, maxWaitMs))]);
 }
 async function revealPage() {
- await waitForVisibleImages();
+  // Keep the initial blank screen in place until the dynamically loaded
+  // stylesheet is ready. Otherwise the static HTML placeholders can flash.
+  if (window.pageStylesReady) await window.pageStylesReady;
+  await waitForVisibleImages();
  // Let the browser lay out the final profile before starting the entrance effect.
  await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
  document.documentElement.classList.remove('page-loading');

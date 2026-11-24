@@ -309,3 +309,10 @@ When `interactionStyle.disableDragSelect` is `true`, the public profile suppress
 Images and links are set `draggable=false`. Normal tap navigation and touch scrolling
 are left intact. Android browser and OS long-press behavior differs by device; these
 settings discourage selection but do not block every browser action or save/copy method.
+
+
+## Asset versioning and browser cache
+
+The public page, editor, and preview each define `window.LINK_ASSET_VERSION` in their HTML `<head>` (currently `2026.11.24.1`). All three must use **the same version**. The project appends `?v=VERSION` to local CSS/JS and to rendered image/icon/font/custom-style URLs. Browsers may reuse the same version instead of downloading everything on every visit.
+
+**When publishing changed assets:** change the version string in `index.html`, `editor.html`, and `preview.html` (for example to `2026.11.24.2`) and deploy together. This forces new asset URLs. GitHub profile preferences (`preference.js`) and site/config JSON continue to be fetched using `cache: 'no-store'`; the version option does not remove GitHub's own CDN caching or affect the initial HTML response. The blank-screen loading style remains inline in `index.html` to prevent a flash of placeholder text.
