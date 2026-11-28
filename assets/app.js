@@ -177,7 +177,7 @@ function showStatus(msg,error=false){const e=$('status');if(e){e.textContent=msg
 function clearStatus(){const e=$('status');if(e)e.hidden=true}
 // Show the profile only when configuration and its visible images are prepared.
 // A bounded wait prevents a broken remote image from leaving a blank page forever.
-async function waitForVisibleImages(maxWaitMs = 2800) {
+async function waitForVisibleImages(maxWaitMs = 800) {
  const imgs = [...document.querySelectorAll('#profile img')];
  if (!imgs.length) return;
  for (const img of imgs) img.loading = 'eager';
@@ -197,10 +197,18 @@ async function revealPage() {
   await waitForVisibleImages();
  // Let the browser lay out the final profile before starting the entrance effect.
  await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+ clearTimeout(window.linkLoadWatchdog);
  document.documentElement.classList.remove('page-loading');
  document.documentElement.classList.add('page-ready');
  const shell = document.querySelector('.profile-shell');
  if (shell) shell.setAttribute('aria-busy', 'false');
+}
+function withProfileTimeout(promise, ms = 4000) {
+ let timeoutId;
+ const timeout = new Promise((_, reject) => {
+   timeoutId = setTimeout(() => reject(new Error('Profile loading timed out.')), ms);
+ });
+ return Promise.race([promise, timeout]).finally(() => clearTimeout(timeoutId));
 }
 async function start(){
  if(!$('profile')||document.body.dataset.preview==='true')return;
@@ -208,6 +216,8 @@ async function start(){
  if (shell) shell.setAttribute('aria-busy', 'true');
  const params=new URLSearchParams(location.search);
  const explicitUser=params.has('user');
+ // Start the local fallback request immediately rather than after GitHub fails.
+ const localProfilePromise = !explicitUser ? getDefault().catch(() => null) : Promise.resolve(null);
  let settings={defaultUser:'Jacob7179'};
  try{const r=await fetch('site.json',{cache:'no-store'});if(r.ok)settings=await r.json()}catch{}
  const user=explicitUser?(params.get('user')||'').trim():(settings.defaultUser||'Jacob7179');
@@ -216,13 +226,14 @@ async function start(){
    // and replace it moments later with a different user.
    if(user){
      try {
-       const {profile,repoBase}=await getGitHubProfile(user);
+       const {profile,repoBase}=await withProfileTimeout(getGitHubProfile(user), explicitUser ? 5000 : 3000);
        // The unqualified homepage uses config.json as the authority for
        // site-owned footer visibility, even when a GitHub profile is loaded.
        // Explicit ?user=... pages continue to honor each user's preference.js.
        if (!explicitUser) {
          try {
-           const defaultConfig = await getDefault();
+           const defaultConfig = await localProfilePromise;
+           if (!defaultConfig) throw new Error('Local configuration unavailable.');
            // Site-owned appearance switches take precedence on the default URL.
            // Explicit ?user=xxx URLs always use that user's preference.js.
            for (const key of ['showFooter', 'avatarFrame']) {
@@ -254,7 +265,7 @@ async function start(){
          showStatus(err.message,true);
        } else {
          // Default profile still works when GitHub is unavailable.
-         try{render(await getDefault());clearStatus();if($('owner-info'))$('owner-info').textContent='GitHub · '+user}
+         try{const fallback = await localProfilePromise; if (!fallback) throw Error('Could not load config.json');render(fallback);clearStatus();if($('owner-info'))$('owner-info').textContent='GitHub · '+user}
          catch(fallbackError){showStatus(fallbackError.message,true)}
        }
      }
@@ -264,12 +275,13 @@ async function start(){
      $('links').replaceChildren();$('socials').replaceChildren();
      showStatus('Enter a valid GitHub username.',true);
    } else {
-     render(await getDefault());clearStatus();
+     {const fallback = await localProfilePromise; if (!fallback) throw Error('Could not load config.json'); render(fallback);clearStatus();}
    }
  } catch(err) {showStatus(err.message||'Unable to load this page.',true)}
  finally {await revealPage()}
 }
 start().catch(() => {
+ clearTimeout(window.linkLoadWatchdog);
  document.documentElement.classList.remove('page-loading');
  document.documentElement.classList.add('page-ready');
 });

@@ -110,3 +110,8 @@ body[data-disable-drag-select="on"] #profile img {
   -webkit-user-drag: none !important;
   user-drag: none;
 }
+
+/* Keep the theme background clean while loading. */
+.page-curtain .loading-error{position:absolute;left:0;right:0;top:calc(50% + 20px);padding:0 18px;text-align:center;font:500 12px/1.5 system-ui,sans-serif;color:#929aad}
+.page-curtain .loading-error[hidden]{display:none}
+html.page-ready .page-curtain .loading-error{visibility:hidden}
